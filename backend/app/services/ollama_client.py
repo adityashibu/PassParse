@@ -14,9 +14,7 @@ PROMPT = """You are a passport data extraction assistant. Extract all fields fro
   "place_of_birth": "",
   "date_of_issue": "DD MMM YYYY",
   "date_of_expiry": "DD MMM YYYY",
-  "passport_number": "",
-  "mrz_line1": "",
-  "mrz_line2": ""
+  "passport_number": ""
 }
 Return only the JSON object. No explanation, no markdown."""
 

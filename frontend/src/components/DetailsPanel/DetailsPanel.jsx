@@ -26,8 +26,6 @@ const FIELDS = [
   { key: "date_of_issue", label: "Date of Issue" },
   { key: "date_of_expiry", label: "Date of Expiry" },
   { key: "passport_number", label: "Passport Number" },
-  { key: "mrz_line1", label: "MRZ Line 1" },
-  { key: "mrz_line2", label: "MRZ Line 2" },
 ];
 
 function FieldRow({ label, value, loading, isMrz, editable, onChange }) {
