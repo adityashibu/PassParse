@@ -220,3 +220,5 @@ __marimo__/
 
 # Node_modules
 node_modules/
+.next/
+passport_database.xlsx
