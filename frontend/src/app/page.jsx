@@ -1,30 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import { Container, Typography, Box, Divider } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import ImageUploader from "@/components/ImageUploader/ImageUploader";
 import ImageEditor from "@/components/ImageEditor/ImageEditor";
-import ResultTable from "@/components/ResultTable/ResultTable";
-import { extractPassport } from "@/services/api";
+import DetailsPanel from "@/components/DetailsPanel/DetailsPanel";
+import { extractPassport, saveToExcel } from "@/services/api";
 
 export default function Home() {
   const [image, setImage] = useState(null);
-  const [croppedImage, setCroppedImage] = useState(null);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [error, setError] = useState(null);
 
   const handleImageAccepted = (file) => {
     setImage(file);
     setResult(null);
     setError(null);
-    setCroppedImage(null);
+    setSaved(false);
   };
 
   const handleCropDone = async (croppedBlob) => {
-    setCroppedImage(croppedBlob);
     setLoading(true);
     setError(null);
+    setSaved(false);
     try {
       const data = await extractPassport(croppedBlob);
       setResult(data);
@@ -35,28 +36,69 @@ export default function Home() {
     }
   };
 
+  const handleFieldChange = (key, value) => {
+    setResult((prev) => ({ ...prev, [key]: value }));
+    setSaved(false);
+  };
+
+  const handleSaveToExcel = async () => {
+    setSaving(true);
+    try {
+      await saveToExcel(result);
+      setSaved(true);
+    } catch (err) {
+      setError(err.message ?? "Failed to save");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleReset = () => {
+    setImage(null);
+    setResult(null);
+    setError(null);
+    setSaved(false);
+  };
+
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h3" fontWeight={700} gutterBottom>
-        PassParse
-      </Typography>
-      <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-        Upload a passport image to extract and save its data automatically.
-      </Typography>
-
-      <Divider sx={{ my: 3 }} />
-
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
-        <ImageUploader onImageAccepted={handleImageAccepted} />
-
-        {image && (
-          <ImageEditor image={image} onCropDone={handleCropDone} loading={loading} />
-        )}
-
-        {(result || error) && (
-          <ResultTable data={result} error={error} />
-        )}
+    <Box sx={{ height: "100vh", display: "flex", flexDirection: "column", bgcolor: "background.default" }}>
+      {/* Header */}
+      <Box sx={{ px: 4, pt: 3, pb: 2, bgcolor: "background.paper", borderBottom: 1, borderColor: "divider" }}>
+        <Box component="span" sx={{ fontSize: 24, fontWeight: 700 }}>PassParse</Box>
+        <Box component="p" sx={{ m: 0, fontSize: 13, color: "text.secondary" }}>
+          Passport data extraction powered by Llama 3.2 Vision
+        </Box>
       </Box>
-    </Container>
+
+      {/* Two-column layout */}
+      <Box sx={{ flex: 1, overflow: "hidden", p: 3 }}>
+        <Grid container spacing={3} sx={{ height: "100%" }}>
+          <Grid item xs={12} md={6} sx={{ height: "100%" }}>
+            <DetailsPanel
+              data={result}
+              error={error}
+              loading={loading}
+              saving={saving}
+              saved={saved}
+              onFieldChange={handleFieldChange}
+              onSaveToExcel={handleSaveToExcel}
+            />
+          </Grid>
+
+          <Grid item xs={12} md={6} sx={{ height: "100%" }}>
+            {!image ? (
+              <ImageUploader onImageAccepted={handleImageAccepted} />
+            ) : (
+              <ImageEditor
+                image={image}
+                onCropDone={handleCropDone}
+                onReset={handleReset}
+                loading={loading}
+              />
+            )}
+          </Grid>
+        </Grid>
+      </Box>
+    </Box>
   );
 }

@@ -13,5 +13,10 @@ async def extract_passport(file: UploadFile = File(...)):
 
     image_bytes = await file.read()
     passport_data = await extract_passport_data(image_bytes)
-    append_to_excel(passport_data)
     return passport_data
+
+
+@router.post("/save-to-excel")
+async def save_to_excel(data: PassportData):
+    append_to_excel(data)
+    return {"status": "saved"}

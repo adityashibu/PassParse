@@ -2,12 +2,21 @@
 
 import { useState, useCallback } from "react";
 import Cropper from "react-easy-crop";
-import { Box, Button, Slider, Typography, Paper, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Button,
+  Slider,
+  Typography,
+  Paper,
+  CircularProgress,
+  Divider,
+} from "@mui/material";
 import RotateRightIcon from "@mui/icons-material/RotateRight";
 import CheckIcon from "@mui/icons-material/Check";
+import ReplayIcon from "@mui/icons-material/Replay";
 import getCroppedImg from "./cropUtils";
 
-export default function ImageEditor({ image, onCropDone, loading }) {
+export default function ImageEditor({ image, onCropDone, onReset, loading }) {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
@@ -24,12 +33,12 @@ export default function ImageEditor({ image, onCropDone, loading }) {
   };
 
   return (
-    <Paper variant="outlined" sx={{ p: 3 }}>
-      <Typography variant="h6" gutterBottom>
-        Crop &amp; Rotate
-      </Typography>
-
-      <Box sx={{ position: "relative", width: "100%", height: 400, bgcolor: "#000", borderRadius: 1, overflow: "hidden" }}>
+    <Paper
+      variant="outlined"
+      sx={{ height: "100%", display: "flex", flexDirection: "column", overflow: "hidden" }}
+    >
+      {/* Crop canvas — fills available space */}
+      <Box sx={{ flex: 1, position: "relative", bgcolor: "#111", minHeight: 0 }}>
         <Cropper
           image={imageUrl}
           crop={crop}
@@ -42,30 +51,53 @@ export default function ImageEditor({ image, onCropDone, loading }) {
         />
       </Box>
 
-      <Box sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 1 }}>
-        <Typography variant="body2">Zoom</Typography>
-        <Slider min={1} max={3} step={0.05} value={zoom} onChange={(_, v) => setZoom(v)} />
+      {/* Controls */}
+      <Box sx={{ p: 2, display: "flex", flexDirection: "column", gap: 1.5 }}>
+        <Box sx={{ display: "flex", gap: 3, alignItems: "center" }}>
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="caption" color="text.secondary">
+              Zoom
+            </Typography>
+            <Slider min={1} max={3} step={0.05} value={zoom} onChange={(_, v) => setZoom(v)} size="small" />
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="caption" color="text.secondary">
+              Rotation
+            </Typography>
+            <Slider min={0} max={360} step={1} value={rotation} onChange={(_, v) => setRotation(v)} size="small" />
+          </Box>
+        </Box>
 
-        <Typography variant="body2">Rotation</Typography>
-        <Slider min={0} max={360} step={1} value={rotation} onChange={(_, v) => setRotation(v)} />
-      </Box>
+        <Divider />
 
-      <Box sx={{ mt: 2, display: "flex", gap: 2 }}>
-        <Button
-          variant="outlined"
-          startIcon={<RotateRightIcon />}
-          onClick={() => setRotation((r) => (r + 90) % 360)}
-        >
-          Rotate 90°
-        </Button>
-        <Button
-          variant="contained"
-          startIcon={loading ? <CircularProgress size={16} color="inherit" /> : <CheckIcon />}
-          onClick={handleConfirm}
-          disabled={loading}
-        >
-          {loading ? "Extracting…" : "Extract Data"}
-        </Button>
+        <Box sx={{ display: "flex", gap: 1.5 }}>
+          <Button
+            variant="outlined"
+            color="inherit"
+            startIcon={<ReplayIcon />}
+            onClick={onReset}
+            disabled={loading}
+          >
+            New Image
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={<RotateRightIcon />}
+            onClick={() => setRotation((r) => (r + 90) % 360)}
+            disabled={loading}
+          >
+            Rotate 90°
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={loading ? <CircularProgress size={16} color="inherit" /> : <CheckIcon />}
+            onClick={handleConfirm}
+            disabled={loading}
+            sx={{ ml: "auto" }}
+          >
+            {loading ? "Extracting…" : "Extract Data"}
+          </Button>
+        </Box>
       </Box>
     </Paper>
   );

@@ -12,6 +12,5 @@ class PassportData(BaseModel):
     date_of_issue: str
     date_of_expiry: str
     passport_number: str
-    personal_number: Optional[str] = None
     mrz_line1: Optional[str] = None
     mrz_line2: Optional[str] = None

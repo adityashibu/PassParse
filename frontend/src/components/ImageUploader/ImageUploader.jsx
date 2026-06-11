@@ -24,8 +24,10 @@ export default function ImageUploader({ onImageAccepted }) {
       {...getRootProps()}
       variant="outlined"
       sx={{
-        p: 6,
-        textAlign: "center",
+        height: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         cursor: "pointer",
         borderStyle: "dashed",
         borderWidth: 2,
@@ -36,9 +38,9 @@ export default function ImageUploader({ onImageAccepted }) {
       }}
     >
       <input {...getInputProps()} />
-      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
-        <UploadFileIcon sx={{ fontSize: 48, color: "primary.main" }} />
-        <Typography variant="h6">
+      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1.5, p: 4 }}>
+        <UploadFileIcon sx={{ fontSize: 64, color: isDragActive ? "primary.main" : "grey.400" }} />
+        <Typography variant="h6" color={isDragActive ? "primary.main" : "text.primary"}>
           {isDragActive ? "Drop the passport image here" : "Drag & drop a passport image"}
         </Typography>
         <Typography variant="body2" color="text.secondary">
